@@ -8,6 +8,9 @@ func main() {
 		Class: 1,
 	}
 
+	dataStudent.SetMyName("brandong")
+	dataStudent.CallMyName()
+	dataStudent.SetMyName("brandong 2")
 	dataStudent.CallMyName()
 
 }
@@ -22,7 +25,7 @@ type StudentInterface interface {
 	CallMyName()
 }
 
-func (s Student) SetMyName(name string) {
+func (s *Student) SetMyName(name string) {
 	s.Name = name
 }
 

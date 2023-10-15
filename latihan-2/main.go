@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"runtime"
 	"sync"
 )
@@ -17,29 +18,56 @@ func main() {
 	fmt.Println("running goroutine in", runtime.NumCPU(), "cpu")
 
 	var wg sync.WaitGroup
+	gameOver := make(chan bool)
 
-	a := Player{Name: "A", Hit: 0}
-	b := Player{Name: "B", Hit: 0}
+	// a := Player{Name: "A", Hit: 0}
+	// b := Player{Name: "B", Hit: 0}
 
-	wg.Add(2)
-	go playPingPong("Player A", &a, &wg)
-	go playPingPong("Player B", &b, &wg)
+	players := []Player{
+		{Name: "a", Hit: 0},
+		{Name: "b", Hit: 0},
+	}
+
+	for _, v := range players {
+		fmt.Println(v)
+		wg.Add(1)
+		go playPingPong(v.Name, &v, gameOver, &wg)
+	}
+
 	wg.Wait()
-	fmt.Printf("Game Over!\nTotal Hits:\nPlayer A: %d\nPlayer B: %d\n", a.Hit, b.Hit)
+
+	// done := make(chan bool)
+
+	// wg.Add(2)
+	// go playPingPong("Player A", &a, done, &wg)
+	// go playPingPong("Player B", &a, done, &wg)
+	// wg.Wait()
+
+	// close(gameOver)
+	<-gameOver
+	// fmt.Printf("Game Over!\nTotal Hits:\nPlayer A: %d\nPlayer B: %d\n", a.Hit, b.Hit)
+	fmt.Printf("Game Over!")
 
 }
 
-func playPingPong(playerName string, player *Player, wg *sync.WaitGroup) {
+func playPingPong(playerName string, player *Player, gameOver chan bool, wg *sync.WaitGroup) {
+
 	defer wg.Done()
 	for {
 
+		randValue := rand.Intn(50)
 		player.Hit++
-		fmt.Printf("%s = Hit %d // counter=hit*2 %d\n", playerName, player.Hit, player.Hit*2)
-		if (player.Hit*2)%11 == 0 {
-			fmt.Printf("%s kalah, total hit: %d, kalah di nomor %d\n", playerName, player.Hit, player.Hit*2)
+		fmt.Printf("%s = Hit %d // counter=%d\n", playerName, player.Hit, randValue)
+		if randValue%11 == 0 {
+			fmt.Printf("%s kalah, total hit: %d, kalah di nomor %d\n", playerName, player.Hit, randValue)
+			gameOver <- true
 			break
+
 		}
+		// player
+
 	}
+
 }
 
 /*

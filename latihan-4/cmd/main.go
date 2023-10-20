@@ -1,14 +1,16 @@
 package main
 
 import (
-	"context"
+	"fmt"
 	"latihan-4/config"
 	"log"
 	"math/rand"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 var users = []User{}
@@ -16,7 +18,7 @@ var users = []User{}
 func main() {
 	// setup routing
 	router := gin.Default()
-	router.Use(Authorization())
+	router.Use(Trace())
 
 	// handler with basic routing
 	router.GET("/hello", func(ctx *gin.Context) {
@@ -43,12 +45,22 @@ func addUser(ctx *gin.Context) {
 	// variable penampung request
 	var req ReqUser
 
+	traceID, _ := ctx.Get("tracer_id")
+	timestamps := time.Now().Format("2006/01/02 15:04:05")
+	traceIDstring := fmt.Sprintf("%s", traceID)
+	ctx.Header("X-TRACE-ID", traceIDstring)
+
 	// proses binding
 	err := ctx.ShouldBindJSON(&req)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
+
+		logMessageIncomingRequest := fmt.Sprintf("%s message=\"%s\" method=\"%s\" uri=\"%s\" trace_id=\"%s\"",
+			timestamps, err.Error(), ctx.Request.Method, ctx.Request.URL.Path, traceID)
+
+		log.Println(logMessageIncomingRequest)
 		return
 	}
 
@@ -73,12 +85,22 @@ func updateUser(ctx *gin.Context) {
 	// variable penampung request
 	var req ReqUser
 
+	traceID, _ := ctx.Get("tracer_id")
+	timestamps := time.Now().Format("2006/01/02 15:04:05")
+	traceIDstring := fmt.Sprintf("%s", traceID)
+	ctx.Header("X-TRACE-ID", traceIDstring)
+
 	userID := ctx.Param("id")
 	userIDInt, err := strconv.Atoi(userID)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
+
+		logMessageIncomingRequest := fmt.Sprintf("%s message=\"%s\" method=\"%s\" uri=\"%s\" trace_id=\"%s\"",
+			timestamps, err.Error(), ctx.Request.Method, ctx.Request.URL.Path, traceID)
+
+		log.Println(logMessageIncomingRequest)
 		return
 	}
 
@@ -88,6 +110,11 @@ func updateUser(ctx *gin.Context) {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
+
+		logMessageIncomingRequest := fmt.Sprintf("%s message=\"%s\" method=\"%s\" uri=\"%s\" trace_id=\"%s\"",
+			timestamps, err.Error(), ctx.Request.Method, ctx.Request.URL.Path, traceID)
+
+		log.Println(logMessageIncomingRequest)
 		return
 	}
 
@@ -121,6 +148,22 @@ func updateUser(ctx *gin.Context) {
 
 func listUsers(ctx *gin.Context) {
 
+	traceID, _ := ctx.Get("tracer_id")
+	timestamps := time.Now().Format("2006/01/02 15:04:05")
+	traceIDstring := fmt.Sprintf("%s", traceID)
+	ctx.Header("X-TRACE-ID", traceIDstring)
+
+	if len(users) == 0 {
+		logMessageIncomingRequest := fmt.Sprintf("%s message=\"%s\" method=\"%s\" uri=\"%s\" trace_id=\"%s\"",
+			timestamps, "data not found", ctx.Request.Method, ctx.Request.URL.Path, traceID)
+
+		log.Println(logMessageIncomingRequest)
+
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"message": "data not found",
+		})
+	}
+
 	// tampilkan hasilnya
 	ctx.JSON(http.StatusOK, gin.H{
 		"success":     true,
@@ -132,12 +175,23 @@ func listUsers(ctx *gin.Context) {
 
 func deleteUser(ctx *gin.Context) {
 
+	traceID, _ := ctx.Get("tracer_id")
+	timestamps := time.Now().Format("2006/01/02 15:04:05")
+	traceIDstring := fmt.Sprintf("%s", traceID)
+	ctx.Header("X-TRACE-ID", traceIDstring)
 	userID := ctx.Param("id")
 	userIDInt, err := strconv.Atoi(userID)
+
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
+
+		logMessageIncomingRequest := fmt.Sprintf("%s message=\"%s\" method=\"%s\" uri=\"%s\" trace_id=\"%s\"",
+			timestamps, err.Error(), ctx.Request.Method, ctx.Request.URL.Path, traceID)
+
+		log.Println(logMessageIncomingRequest)
+
 		return
 	}
 
@@ -173,23 +227,36 @@ type User struct {
 	Address string `json:"address"`
 }
 
-func Authorization() gin.HandlerFunc {
+func Trace() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		// do process validation
-		// get user id from token
-		userId := 10
 
-		log.Println("Authrorization: set user id with", userId)
-		// get context
-		myCtx := ctx.Request.Context()
-		// set context
-		myCtx = context.WithValue(myCtx, "USER_ID", userId)
-		// get request with new context
-		req := ctx.Request.WithContext(myCtx)
-		// change the request to new request with new context
-		ctx.Request = req
+		// log.Println("Authrorization: set user id with", userId)
+		// // get context
+		// myCtx := ctx.Request.Context()
+		// // set context
+		// myCtx = context.WithValue(myCtx, "USER_ID", userId)
+		// // get request with new context
+		// req := ctx.Request.WithContext(myCtx)
+		// // change the request to new request with new context
+		// ctx.Request = req
+
+		tracerID := uuid.New()
+
+		timestamps := time.Now().Format("2006/01/02 15:04:05")
+		// Format pesan log sebagai string
+		logMessageIncomingRequest := fmt.Sprintf("%s message=\"%s\" method=\"%s\" uri=\"%s\" trace_id=\"%s\"",
+			timestamps, "incoming Request", ctx.Request.Method, ctx.Request.URL.Path, tracerID)
+
+		log.Println(logMessageIncomingRequest)
+
+		ctx.Set("tracer_id", tracerID)
+
 		ctx.Next()
-		log.Println("after request")
+		// Format pesan log sebagai string
+		logMessageAfterRequest := fmt.Sprintf("%s message=\"%s\" method=\"%s\" uri=\"%s\" trace_id=\"%s\"",
+			timestamps, "finish request", ctx.Request.Method, ctx.Request.URL.Path, tracerID)
+
+		log.Println(logMessageAfterRequest)
 
 	}
 }

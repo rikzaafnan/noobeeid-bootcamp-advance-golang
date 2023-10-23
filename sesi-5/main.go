@@ -26,12 +26,22 @@ type DBConfig struct {
 
 func main() {
 
-	err := godotenv.Load(".app.env", ".db.env")
+	cfg, err := loadConfig()
 	if err != nil {
 		panic(err)
 	}
 
-	cfg := Config{
+	log.Println("server runneingh a port", cfg.App.Port)
+
+}
+
+func loadConfig(filename ...string) (cfg Config, err error) {
+	err = godotenv.Load(".app.env", ".db.env")
+	if err != nil {
+		return
+	}
+
+	cfg = Config{
 		App: AppConfig{
 			Port: os.Getenv("APP_PORT"),
 		},
@@ -43,15 +53,17 @@ func main() {
 			Name: os.Getenv("DB_NAME"),
 		},
 	}
-
 	log.Printf("%+v", cfg)
+	return cfg, nil
+}
 
-	appPort := os.Getenv("APP_PORT")
+func getEnvStrinc(key string, fallback string) (vcal string) {
+	val := os.Getenv(key)
 
-	if appPort == "" {
-		appPort = ":55555"
+	if val == "" {
+		val = fallback
 	}
 
-	log.Println("server runneingh a port", appPort)
+	return
 
 }

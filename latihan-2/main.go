@@ -18,41 +18,43 @@ func main() {
 	fmt.Println("running goroutine in", runtime.NumCPU(), "cpu")
 
 	var wg sync.WaitGroup
-	gameOver := make(chan bool)
+	// gameOver := make(chan bool)
 
-	// a := Player{Name: "A", Hit: 0}
-	// b := Player{Name: "B", Hit: 0}
+	// players := []Player{
+	// 	{Name: "a", Hit: 0},
+	// 	{Name: "b", Hit: 0},
+	// }
 
-	players := []Player{
-		{Name: "a", Hit: 0},
-		{Name: "b", Hit: 0},
-	}
+	// for _, v := range players {
+	// 	fmt.Println(v)
+	// 	wg.Add(1)
+	// 	go playPingPong(v.Name, &v, gameOver, &wg)
+	// }
 
-	for _, v := range players {
-		fmt.Println(v)
-		wg.Add(1)
-		go playPingPong(v.Name, &v, gameOver, &wg)
-	}
-
-	wg.Wait()
+	// wg.Wait()
 
 	// done := make(chan bool)
 
-	// wg.Add(2)
-	// go playPingPong("Player A", &a, done, &wg)
-	// go playPingPong("Player B", &a, done, &wg)
-	// wg.Wait()
+	a := Player{Name: "A", Hit: 0}
+	b := Player{Name: "B", Hit: 0}
 
-	// close(gameOver)
-	<-gameOver
-	// fmt.Printf("Game Over!\nTotal Hits:\nPlayer A: %d\nPlayer B: %d\n", a.Hit, b.Hit)
-	fmt.Printf("Game Over!")
+	wg.Add(2)
+	go playPingPong("Player A", &a, &wg)
+	go playPingPong("Player B", &b, &wg)
+	wg.Wait()
+
+	fmt.Printf("Game Over!\nTotal Hits:\nPlayer A: %d\nPlayer B: %d\n", a.Hit, b.Hit)
 
 }
 
-func playPingPong(playerName string, player *Player, gameOver chan bool, wg *sync.WaitGroup) {
+func playPingPong(playerName string, player *Player, wg *sync.WaitGroup) {
 
-	defer wg.Done()
+	if wg != nil {
+
+		defer wg.Done()
+
+	}
+
 	for {
 
 		randValue := rand.Intn(50)
@@ -60,7 +62,6 @@ func playPingPong(playerName string, player *Player, gameOver chan bool, wg *syn
 		fmt.Printf("%s = Hit %d // counter=%d\n", playerName, player.Hit, randValue)
 		if randValue%11 == 0 {
 			fmt.Printf("%s kalah, total hit: %d, kalah di nomor %d\n", playerName, player.Hit, randValue)
-			gameOver <- true
 			break
 
 		}

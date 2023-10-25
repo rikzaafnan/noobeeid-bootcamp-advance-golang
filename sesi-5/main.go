@@ -1,69 +1,42 @@
 package main
 
 import (
-	"github.com/joho/godotenv"
+	"encoding/json"
 	"log"
-	"os"
+	"net/http"
+	"sesi-5/config"
+	"sesi-5/database"
 )
 
-// setup struct coinfig
-type Config struct {
-	App AppConfig
-	DB  DBConfig
-}
-
-type AppConfig struct {
-	Port string
-}
-
-type DBConfig struct {
-	Host string
-	Port string
-	User string
-	Pass string
-	Name string
-}
+var envFiles = []string{".app.env", ".db.env"}
 
 func main() {
 
-	cfg, err := loadConfig()
+	//cfg := loadConfig(envFiles...)
+	cfg := config.LoadConfigYaml("config.yaml")
+	db, err := database.ConnectPostgres(cfg.DB)
 	if err != nil {
 		panic(err)
 	}
 
-	log.Println("server runneingh a port", cfg.App.Port)
-
-}
-
-func loadConfig(filename ...string) (cfg Config, err error) {
-	err = godotenv.Load(".app.env", ".db.env")
-	if err != nil {
-		return
+	if db != nil {
+		log.Println("db connected")
 	}
 
-	cfg = Config{
-		App: AppConfig{
-			Port: os.Getenv("APP_PORT"),
-		},
-		DB: DBConfig{
-			Host: os.Getenv("DB_HOST"),
-			Port: os.Getenv("DB_PORT"),
-			User: os.Getenv("DB_USER"),
-			Pass: os.Getenv("DB_PASS"),
-			Name: os.Getenv("DB_NAME"),
-		},
-	}
+	log.Println(db)
+
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		// load config
+		// diini nanti akan mengembalikan config yang berbeda
+		// jika ada perubahan pada file nya
+		//cfg := loadConfig(envFiles...)
+		cfg := config.LoadConfigYaml("config.yaml")
+		json.NewEncoder(w).Encode(cfg)
+	})
+
 	log.Printf("%+v", cfg)
-	return cfg, nil
-}
-
-func getEnvStrinc(key string, fallback string) (vcal string) {
-	val := os.Getenv(key)
-
-	if val == "" {
-		val = fallback
-	}
-
-	return
+	log.Println("server running a port", cfg.App.Port)
+	http.ListenAndServe(cfg.App.Port, nil)
 
 }

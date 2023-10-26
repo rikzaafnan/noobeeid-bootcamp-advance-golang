@@ -7,7 +7,7 @@ import (
 
 type Config struct {
 	App App `yaml:"app"`
-	DB  DB  `yaml:"database"`
+	DB  DB  `yaml:"db"`
 }
 
 type App struct {

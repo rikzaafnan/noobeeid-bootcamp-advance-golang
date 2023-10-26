@@ -1,10 +1,10 @@
 app:
-  port: ":8888"
+  port: ":9999"
 
 db:
-  host: "localhost"
-  port: "5432"
-  user: "admin_postgres"
-  pass: "admin_password"
+  host: "142.202.243.83"
+  port: "10012"
+  user: "root_admin"
+  pass: "root_password"
   name: "bootcamp-intermediate"
   CONNECTION_DB_LIB: "sqlx"

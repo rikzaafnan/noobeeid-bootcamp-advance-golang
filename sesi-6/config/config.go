@@ -15,11 +15,12 @@ type App struct {
 }
 
 type DB struct {
-	Host string `yaml:"host"`
-	Port string `yaml:"port"`
-	User string `yaml:"user"`
-	Pass string `yaml:"pass"`
-	Name string `yaml:"name"`
+	Host            string `yaml:"host"`
+	Port            string `yaml:"port"`
+	User            string `yaml:"user"`
+	Pass            string `yaml:"pass"`
+	Name            string `yaml:"name"`
+	ConnectionDBLib string `yaml:"CONNECTION_DB_LIB"`
 }
 
 var Cfg *Config

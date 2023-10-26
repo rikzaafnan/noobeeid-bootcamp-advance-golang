@@ -7,3 +7,4 @@ db:
   user: "admin_postgres"
   pass: "admin_password"
   name: "bootcamp-intermediate"
+  CONNECTION_DB_LIB: "sqlx"

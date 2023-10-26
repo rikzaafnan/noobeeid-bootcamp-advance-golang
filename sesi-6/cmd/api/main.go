@@ -22,14 +22,23 @@ func main() {
 
 	db, err := database.ConnectGORMPostgres(config.Cfg.DB)
 	if err != nil {
-		panic(err)
+		log.Println("connection db db gorm not connected....")
 	}
 
 	if db != nil {
-		log.Println("db connected....")
+		log.Println("connection db db gorm connected....")
 	}
 
-	product.RegisterServiceProduct(router, db)
+	dbSQLX, err := database.ConnectSQLXPostgres(config.Cfg.DB)
+	if err != nil {
+		log.Println("connection db sqlx not connected....")
+	}
+
+	if db != nil {
+		log.Println("connection db sqlx connected....")
+	}
+
+	product.RegisterServiceProduct(router, db, dbSQLX, config.Cfg.DB.ConnectionDBLib)
 
 	router.Listen(config.Cfg.App.Port)
 

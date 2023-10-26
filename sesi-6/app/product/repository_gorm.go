@@ -18,3 +18,8 @@ func NewPostgresGormRepository(db *gorm.DB) PostgresGormRepository {
 func (p PostgresGormRepository) Create(ctx context.Context, model Product) (err error) {
 	return p.db.Create(&model).Error
 }
+
+func (p PostgresGormRepository) FindAll(ctx context.Context) (products []Product, err error) {
+
+	return
+}

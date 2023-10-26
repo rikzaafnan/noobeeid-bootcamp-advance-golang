@@ -5,11 +5,16 @@ import (
 	"log"
 )
 
-type Service struct {
-	repo PostgresGormRepository
+type Repository interface {
+	Create(ctx context.Context, req Product) (err error)
+	FindAll(ctx context.Context) (products []Product, err error)
 }
 
-func NewService(repo PostgresGormRepository) Service {
+type Service struct {
+	repo Repository
+}
+
+func NewService(repo Repository) Service {
 	return Service{
 		repo: repo,
 	}
@@ -26,6 +31,19 @@ func (s Service) CreateProduct(ctx context.Context, req Product) (err error) {
 		log.Println("error when try to create to database with error", err.Error())
 		return
 	}
+
+	return nil
+}
+
+func (s Service) FindAllProduct(ctx context.Context) (err error) {
+
+	products, err := s.repo.FindAll(ctx)
+	if err != nil {
+		log.Println("error when try to create to database with error", err.Error())
+		return
+	}
+
+	log.Println(products)
 
 	return nil
 }

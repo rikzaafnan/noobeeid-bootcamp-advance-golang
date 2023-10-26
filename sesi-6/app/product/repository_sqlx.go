@@ -15,7 +15,7 @@ func NewPostgresSQLXRepository(db *sqlx.DB) PostgresSQLXRepository {
 	}
 }
 
-func (p PostgresSQLXRepository) CreateProductData(ctx context.Context, model Product) (err error) {
+func (p PostgresSQLXRepository) Create(ctx context.Context, model Product) (err error) {
 
 	query := `
 		INSERT INTO products ( name, category, price, stock) VALUES (:name, :category, :price, :stock)
@@ -32,6 +32,16 @@ func (p PostgresSQLXRepository) CreateProductData(ctx context.Context, model Pro
 	if err != nil {
 		return
 	}
+
+	return
+}
+func (p PostgresSQLXRepository) FindAll(_ context.Context) (products []Product, err error) {
+
+	query := `
+		SELECT id, name, category, price, stock FROM products 
+	`
+
+	err = p.db.Select(&products, query)
 
 	return
 }

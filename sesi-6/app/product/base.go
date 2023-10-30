@@ -27,6 +27,10 @@ func RegisterServiceProduct(router fiber.Router, db *gorm.DB, dbSQLX *sqlx.DB, c
 	var productRouter = router.Group("/products")
 	{
 		productRouter.Post("", handler.CreateProduct)
+		productRouter.Get("", handler.FindAllProduct)
+		productRouter.Get(":productID", handler.FindOneProductByProductID)
+		productRouter.Put(":productID", handler.UpdateProductByProductID)
+		productRouter.Delete(":productID", handler.DeleteProductByProductID)
 	}
 
 }

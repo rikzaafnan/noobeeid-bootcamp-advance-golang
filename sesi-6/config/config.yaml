@@ -1,5 +1,5 @@
 app:
-  port: ":9999"
+  port: ":8888"
 
 db:
   host: "142.202.243.83"
@@ -7,4 +7,4 @@ db:
   user: "root_admin"
   pass: "root_password"
   name: "bootcamp-intermediate"
-  CONNECTION_DB_LIB: "sqlx"
+  CONNECTION_DB_LIB: "gorm"

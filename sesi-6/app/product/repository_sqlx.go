@@ -45,3 +45,33 @@ func (p PostgresSQLXRepository) FindAll(_ context.Context) (products []Product, 
 
 	return
 }
+
+func (p PostgresSQLXRepository) FindOneByProductID(_ context.Context, productID int64) (product Product, err error) {
+
+	//err = p.db.Where("id = ?", productID).First(&product).Error
+	//if err != nil {
+	//	return product, err
+	//}
+
+	return product, nil
+}
+
+func (p PostgresSQLXRepository) UpdateProductByProductID(_ context.Context, productID int64, req Product) (err error) {
+
+	//err = p.db.Where("id = ?", productID).First(&product).Error
+	//if err != nil {
+	//	return product, err
+	//}
+
+	return nil
+}
+
+func (p PostgresSQLXRepository) DeleteOneProductByProductID(_ context.Context, productID int64) (err error) {
+
+	//err = p.db.Where("id = ?", productID).First(&product).Error
+	//if err != nil {
+	//	return product, err
+	//}
+
+	return nil
+}

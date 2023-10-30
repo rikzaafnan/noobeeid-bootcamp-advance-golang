@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"sesi-6/app/product"
 	"sesi-6/config"
 )
 
@@ -17,7 +16,8 @@ func ConnectGORMPostgres(cfg config.DB) (db *gorm.DB, err error) {
 		return
 	}
 
-	db.Debug().AutoMigrate(product.Product{})
+	//db.Debug().AutoMigrate(product.Product{})
+	db.Debug()
 
 	return
 }

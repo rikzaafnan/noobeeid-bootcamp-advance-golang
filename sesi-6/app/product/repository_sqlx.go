@@ -2,7 +2,9 @@ package product
 
 import (
 	"context"
+	"errors"
 	"github.com/jmoiron/sqlx"
+	"log"
 )
 
 type PostgresSQLXRepository struct {
@@ -42,36 +44,57 @@ func (p PostgresSQLXRepository) FindAll(_ context.Context) (products []Product, 
 	`
 
 	err = p.db.Select(&products, query)
+	if err != nil {
+		log.Println(err)
+		return
+	}
 
 	return
 }
 
 func (p PostgresSQLXRepository) FindOneByProductID(_ context.Context, productID int64) (product Product, err error) {
 
-	//err = p.db.Where("id = ?", productID).First(&product).Error
-	//if err != nil {
-	//	return product, err
-	//}
+	query := `
+		SELECT id, name, category, price, stock FROM products WHERE id = $1
+	`
+
+	err = p.db.Get(&product, query, productID)
+	if err != nil {
+		log.Println(err)
+		return
+	}
 
 	return product, nil
 }
 
 func (p PostgresSQLXRepository) UpdateProductByProductID(_ context.Context, productID int64, req Product) (err error) {
 
-	//err = p.db.Where("id = ?", productID).First(&product).Error
-	//if err != nil {
-	//	return product, err
-	//}
+	req.Id = int(productID)
+
+	row, err := p.db.NamedExec(`UPDATE products
+				SET name = :name, category = :category, price = :price, stock = :stock
+				WHERE id = :id`, req)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	rowAffected, _ := row.RowsAffected()
+	if rowAffected < 0 {
+		return errors.New("internal server error")
+	}
 
 	return nil
 }
 
 func (p PostgresSQLXRepository) DeleteOneProductByProductID(_ context.Context, productID int64) (err error) {
 
-	//err = p.db.Where("id = ?", productID).First(&product).Error
-	//if err != nil {
-	//	return product, err
-	//}
+	row := p.db.MustExec("DELETE FROM products WHERE id = $1", productID)
+
+	rowAffected, _ := row.RowsAffected()
+	if rowAffected < 0 {
+		return errors.New("internal server error")
+	}
 
 	return nil
 }

@@ -2,7 +2,9 @@ package product
 
 import (
 	"context"
+	"errors"
 	"log"
+	"strings"
 )
 
 type Repository interface {
@@ -69,7 +71,13 @@ func (s Service) UpdateProductByProductID(ctx context.Context, productID int64, 
 
 	product, err := s.repo.FindOneByProductID(ctx, productID)
 	if err != nil {
+
+		if strings.Contains(err.Error(), "sql: no rows in result set") {
+			err = errors.New("record not found")
+		}
+
 		log.Println("error when try to get with error", err.Error())
+
 		return err
 	}
 

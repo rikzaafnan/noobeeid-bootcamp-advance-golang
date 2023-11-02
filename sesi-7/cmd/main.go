@@ -5,6 +5,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"log"
+	"sesi_7/app/auth"
 	"sesi_7/database"
 	"time"
 )
@@ -17,23 +18,44 @@ func main() {
 	defer cancel()
 
 	uri := "mongodb://admin:admin-password@localhost:27017/"
-	mongodb, err := database.ConnectMongo(ctx, uri)
+	mongoClient, err := database.ConnectMongo(ctx, uri)
 	if err != nil {
 		log.Println("db not connected with error ", err.Error())
 		return
 	}
 
-	if mongodb == nil {
+	if mongoClient == nil {
 		log.Println("db not connected with unknown error ")
 		return
 	}
 
+	mongoDB := mongoClient.Database(database.DB_NAME)
+
+	repo, err := auth.NewRepositoryMongo(mongoClient, mongoDB)
+	if err != nil {
+		log.Println("error when to try to execute NewRepositoryMongo with detail : ", err.Error())
+		return
+	}
+
+	lastId, err := repo.Insert(ctx, auth.Auth{
+		Email:     "reyhan@mail.com",
+		CreatedAt: time.Now(),
+		IsActive:  false,
+	})
+
+	if err != nil {
+		log.Println("error when to try to execute repo.insert with detail : ", err.Error())
+		return
+	}
+
+	log.Println("insert success with id : ", lastId)
+
 	log.Println("db connected")
 
-	Insert(ctx, mongodb, Auth{
-		//Id:   primitive.NewObjectID(),
-		Name: "Reyhan 2",
-	})
+	//Insert(ctx, mongoClient, Auth{
+	//	//Id:   primitive.NewObjectID(),
+	//	Name: "Reyhan 2",
+	//})
 
 }
 

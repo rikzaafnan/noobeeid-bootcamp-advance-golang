@@ -10,16 +10,22 @@ import (
 
 type RepositoryMongo struct {
 	client *mongo.Client
+	db     *mongo.Database
 }
 
-func NewRepositoryMongo(client *mongo.Client) (repo RepositoryMongo, err error) {
+func NewRepositoryMongo(client *mongo.Client, db *mongo.Database) (repo RepositoryMongo, err error) {
 	if client == nil {
 		err = errors.New("client is nil")
 		return
 	}
 
+	if db == nil {
+		err = errors.New("db is nil")
+	}
+
 	repo = RepositoryMongo{
 		client: client,
+		db:     db,
 	}
 
 	return

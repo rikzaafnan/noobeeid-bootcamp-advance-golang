@@ -8,7 +8,7 @@ import (
 	"sesi-5/database"
 )
 
-var envFiles = []string{".app.env", ".db.env"}
+var envFiles = []string{".app.env", ".database.env"}
 
 func main() {
 
@@ -20,7 +20,7 @@ func main() {
 	}
 
 	if db != nil {
-		log.Println("db connected")
+		log.Println("database connected")
 	}
 
 	log.Println(db)

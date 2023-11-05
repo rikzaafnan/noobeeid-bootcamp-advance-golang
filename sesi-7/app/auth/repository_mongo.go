@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 	"errors"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"sesi_7/database"
@@ -45,4 +46,12 @@ func (r RepositoryMongo) Insert(ctx context.Context, model Auth) (insertId primi
 	}
 
 	return insertID, nil
+}
+
+func (r RepositoryMongo) FindOneById(ctx context.Context, id string) (model Auth, err error) {
+
+	collection := r.db.Collection(model.GetCollection())
+	err = collection.FindOne(ctx, bson.M{"email": id}).Decode(&model)
+
+	return
 }

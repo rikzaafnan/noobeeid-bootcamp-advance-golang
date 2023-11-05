@@ -19,7 +19,7 @@ func main() {
 	// running in new goroutine
 	go speak(2, "Goroutine 3")
 
-	// running in main goroutine
+	// running in main.go goroutine
 	speak(2, "Hello")
 
 	time.Sleep(1 * time.Second)

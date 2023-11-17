@@ -20,7 +20,10 @@ func main() {
 	//mongoDB(timeout)
 
 	//	redis
-	redis(timeout)
+	//redis(timeout)
+
+	//meili
+	meili(timeout)
 
 }
 
@@ -128,23 +131,6 @@ func meili(timeout time.Duration) {
 		return
 	}
 	log.Println("redis connected")
-
-	err = redisClient.Set(ctx, "token-user01", "ini token user contoh", 10*time.Second).Err()
-	if err != nil {
-		log.Println("error set data ", err.Error())
-		return
-	}
-
-	log.Println("success create data")
-
-	cmd := redisClient.Get(ctx, "token-user02")
-	res, err := cmd.Result()
-	if err != nil {
-		log.Println("error get data ", err.Error())
-		return
-	}
-
-	log.Println("isi token token-user02 adalah : ", res)
 
 }
 

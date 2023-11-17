@@ -14,6 +14,8 @@ func main() {
 
 	timeout := 5 * time.Second
 
+	log.Println(timeout)
+
 	//	mongodb
 	//mongoDB(timeout)
 

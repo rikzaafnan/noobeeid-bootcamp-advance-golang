@@ -113,6 +113,41 @@ func redis(timeout time.Duration) {
 
 }
 
+func meili(timeout time.Duration) {
+	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(timeout))
+
+	defer cancel()
+	redisClient, err := database.ConnectMeilisearch(ctx, "localhost:6379")
+	if err != nil {
+		log.Println("db not connected with error ", err.Error())
+		return
+	}
+
+	if redisClient == nil {
+		log.Println("db not connected with unknown error ")
+		return
+	}
+	log.Println("redis connected")
+
+	err = redisClient.Set(ctx, "token-user01", "ini token user contoh", 10*time.Second).Err()
+	if err != nil {
+		log.Println("error set data ", err.Error())
+		return
+	}
+
+	log.Println("success create data")
+
+	cmd := redisClient.Get(ctx, "token-user02")
+	res, err := cmd.Result()
+	if err != nil {
+		log.Println("error get data ", err.Error())
+		return
+	}
+
+	log.Println("isi token token-user02 adalah : ", res)
+
+}
+
 type Auth struct {
 	Id   primitive.ObjectID `bson:"-"`
 	Name string             `bson:"name"`
